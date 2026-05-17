@@ -18,7 +18,6 @@
   }
   body{background:var(--paper);font-family:'DM Sans',sans-serif;color:var(--ink);min-height:100vh;}
 
-  /* Connect screen */
   .connect-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;}
   .connect-logo{font-family:'DM Serif Display',serif;font-size:32px;color:var(--ink);margin-bottom:8px;}
   .connect-tag{font-size:14px;color:var(--muted);margin-bottom:48px;text-align:center;}
@@ -30,15 +29,14 @@
   .connect-btn:hover{background:#0ea0d4;}
   .connect-note{font-size:11px;color:var(--muted);margin-top:16px;line-height:1.6;}
   .connect-features{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:32px;text-align:left;}
-  .feature{background:var(--paper);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--soft);}
+  .feature{background:var(--paper);border-radius:8px;padding:12px 14px;}
   .feature-title{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:3px;}
+  .feature-desc{font-size:12px;color:var(--soft);}
 
-  /* Loading */
   .loading-screen{position:fixed;inset:0;background:rgba(248,247,244,0.95);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;font-size:14px;color:var(--soft);z-index:100;}
   .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
-  /* Dashboard */
   .dashboard{display:none;}
   .header{background:var(--ink);padding:18px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
   .header-left h1{font-family:'DM Serif Display',serif;font-size:20px;color:#fff;font-weight:400;}
@@ -74,7 +72,6 @@
   .cs{font-size:11px;color:var(--muted);}
   .cb{padding:18px;}
 
-  /* Invoice list */
   .inv-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid #f5f2ed;gap:12px;font-size:13px;}
   .inv-row:last-child{border-bottom:none;}
   .inv-contact{flex:1;color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -84,7 +81,6 @@
   .inv-days.a{background:var(--abg);color:var(--amber);}
   .inv-amount{font-weight:600;flex-shrink:0;min-width:80px;text-align:right;}
 
-  /* Insight cards */
   .insight{background:var(--paper);border-radius:8px;padding:14px;margin-bottom:10px;border:1px solid var(--border);}
   .insight:last-child{margin-bottom:0;}
   .insight-title{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:4px;}
@@ -96,38 +92,29 @@
 </head>
 <body>
 
-<!-- Loading -->
 <div class="loading-screen" id="loading">
   <div class="spinner"></div>
   <div id="loading-msg">Connecting to Xero&hellip;</div>
 </div>
 
-<!-- Connect screen -->
 <div class="connect-screen" id="connect-screen">
   <div class="connect-logo">Finance Dashboard</div>
   <div class="connect-tag">Instant financial clarity — powered by your Xero data</div>
-
   <div class="connect-box">
     <div class="connect-icon">📊</div>
     <div class="connect-title">Connect your Xero account</div>
-    <div class="connect-sub">
-      See your cash position, outstanding invoices, top clients and financial health at a glance.
-      Read-only access — we never modify your data.
-    </div>
+    <div class="connect-sub">See your cash position, outstanding invoices, top clients and financial health at a glance. Read-only access — we never modify your data.</div>
     <button class="connect-btn" onclick="connectXero()">Connect to Xero</button>
-    <div class="connect-note">
-      Read-only access &middot; Data never leaves your browser &middot; Disconnect any time
-    </div>
+    <div class="connect-note">Read-only access &middot; Data never leaves your browser &middot; Disconnect any time</div>
     <div class="connect-features">
-      <div class="feature"><div class="feature-title">Cash position</div>Live bank balance across all accounts</div>
-      <div class="feature"><div class="feature-title">Overdue invoices</div>Who owes you and for how long</div>
-      <div class="feature"><div class="feature-title">Top clients</div>Revenue by contact this year</div>
-      <div class="feature"><div class="feature-title">Burn rate</div>Months of runway at current spend</div>
+      <div class="feature"><div class="feature-title">Cash position</div><div class="feature-desc">Live bank balance across all accounts</div></div>
+      <div class="feature"><div class="feature-title">Overdue invoices</div><div class="feature-desc">Who owes you and for how long</div></div>
+      <div class="feature"><div class="feature-title">Top clients</div><div class="feature-desc">Revenue by contact this year</div></div>
+      <div class="feature"><div class="feature-title">Burn rate</div><div class="feature-desc">Monthly spend at current rate</div></div>
     </div>
   </div>
 </div>
 
-<!-- Dashboard -->
 <div class="dashboard" id="dashboard">
   <div class="header">
     <div class="header-left">
@@ -139,10 +126,8 @@
       <button class="hbtn" onclick="disconnect()">Disconnect</button>
     </div>
   </div>
-
   <div class="main">
     <div class="kpis" id="dash-kpis"></div>
-
     <div class="grid g32">
       <div class="card">
         <div class="ch"><div class="ct">Income vs Expenditure</div><div class="cs">Current financial year by month</div></div>
@@ -153,7 +138,6 @@
         <div class="cb" id="dash-insights"></div>
       </div>
     </div>
-
     <div class="grid g2">
       <div class="card">
         <div class="ch"><div class="ct">Overdue Invoices</div><div class="cs" id="overdue-sub"></div></div>
@@ -165,15 +149,16 @@
       </div>
     </div>
   </div>
-
   <div class="footer" id="dash-footer"></div>
 </div>
 
 <script>
 // ── CONFIG ───────────────────────────────────────────────────
-var CLIENT_ID    = '6DDF8F4971E14C62A4DC808F2573BB74';
-var REDIRECT_URI = 'https://davidianconway-alt.github.io/finance-dashboard/';
-var SCOPES = 'openid profile email accounting.invoices.read accounting.payments.read accounting.reports.read accounting.settings.read accounting.contacts.read accounting.journals.read offline_access';
+var CLIENT_ID     = 'FB085F45AFD84EED86CA9292ED855EA7';
+var CLIENT_SECRET = 'hNI0DlIPK4z1Fc0aipAB9VpNIOAQnwbmvrD24LYrAUfmzAuh';
+var REDIRECT_URI  = 'https://davidianconway-alt.github.io/finance-dashboard/';
+var SCOPES        = 'openid profile email accounting.invoices.read accounting.payments.read accounting.reports.read accounting.settings.read accounting.contacts.read offline_access';
+
 // ── STATE ────────────────────────────────────────────────────
 var accessToken  = null;
 var tenantId     = null;
@@ -182,7 +167,6 @@ var chartClients = null;
 
 // ── ON LOAD ──────────────────────────────────────────────────
 window.addEventListener('load', function() {
-  // Handle OAuth callback
   var params = new URLSearchParams(window.location.search);
   var code   = params.get('code');
   var state  = params.get('state');
@@ -190,39 +174,32 @@ window.addEventListener('load', function() {
   if (code) {
     var savedState = sessionStorage.getItem('xero_state');
     var verifier   = sessionStorage.getItem('xero_verifier');
-
     if (state !== savedState) {
       showError('Security check failed. Please try connecting again.');
       return;
     }
-
-    // Clean URL
     window.history.replaceState({}, document.title, window.location.pathname);
-
     showLoading('Exchanging token&hellip;');
     exchangeToken(code, verifier);
   }
 });
 
-// ── OAUTH PKCE ───────────────────────────────────────────────
+// ── OAUTH ────────────────────────────────────────────────────
 
 function connectXero() {
   var verifier = generateVerifier();
   var state    = generateVerifier().substring(0, 16);
-
   sessionStorage.setItem('xero_verifier', verifier);
   sessionStorage.setItem('xero_state', state);
-
   generateChallenge(verifier).then(function(challenge) {
-    var url = 'https://login.xero.com/identity/connect/authorize?' +
-      'response_type=code' +
-      '&client_id=' + CLIENT_ID +
-      '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) +
-      '&scope=' + encodeURIComponent(SCOPES) +
-      '&state=' + state +
-      '&code_challenge=' + challenge +
-      '&code_challenge_method=S256';
-
+    var url = 'https://login.xero.com/identity/connect/authorize'
+      + '?response_type=code'
+      + '&client_id=' + CLIENT_ID
+      + '&redirect_uri=' + encodeURIComponent(REDIRECT_URI)
+      + '&scope=' + encodeURIComponent(SCOPES)
+      + '&state=' + state
+      + '&code_challenge=' + challenge
+      + '&code_challenge_method=S256';
     window.location.href = url;
   });
 }
@@ -230,10 +207,11 @@ function connectXero() {
 function exchangeToken(code, verifier) {
   var body = new URLSearchParams({
     grant_type:    'authorization_code',
-    code:          code,
-    redirect_uri:  REDIRECT_URI,
-    client_id:     CLIENT_ID,
-    code_verifier: verifier
+    code:           code,
+    redirect_uri:   REDIRECT_URI,
+    client_id:      CLIENT_ID,
+    client_secret:  CLIENT_SECRET,
+    code_verifier:  verifier
   });
 
   fetch('https://identity.xero.com/connect/token', {
@@ -241,17 +219,16 @@ function exchangeToken(code, verifier) {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body:    body.toString()
   })
-  .then(function(r) { return r.json(); })
+  .then(function(r){ return r.json(); })
   .then(function(data) {
     if (data.access_token) {
       accessToken = data.access_token;
-      sessionStorage.setItem('xero_token', accessToken);
       getTenants();
     } else {
       showError('Could not get access token: ' + (data.error_description || data.error || 'Unknown error'));
     }
   })
-  .catch(function(e) { showError('Token exchange failed: ' + e.message); });
+  .catch(function(e){ showError('Token exchange failed: ' + e.message); });
 }
 
 function getTenants() {
@@ -259,215 +236,182 @@ function getTenants() {
   xeroGet('https://api.xero.com/connections')
   .then(function(tenants) {
     if (!tenants || tenants.length === 0) {
-      showError('No Xero organisations found. Make sure you have access to at least one organisation.');
+      showError('No Xero organisations found.');
       return;
     }
     tenantId = tenants[0].tenantId;
     loadDashboard();
   })
-  .catch(function(e) { showError('Could not get organisations: ' + e.message); });
+  .catch(function(e){ showError('Could not get organisations: ' + e.message); });
 }
 
-// ── LOAD DASHBOARD ───────────────────────────────────────────
+// ── LOAD DATA ────────────────────────────────────────────────
 
 function loadDashboard() {
   showLoading('Loading your financial data&hellip;');
-
-  var now      = new Date();
-  var thisYear = now.getFullYear();
-
-  // UK/AU financial year: April to March
-  // If before April, financial year started last calendar year
-  var fyStart  = now.getMonth() < 3
-    ? (thisYear - 1) + '-04-01'
-    :  thisYear      + '-04-01';
-  var fyEnd    = now.getMonth() < 3
-    ?  thisYear      + '-03-31'
-    : (thisYear + 1) + '-03-31';
+  var now     = new Date();
+  var fyStart = now.getMonth() < 3 ? (now.getFullYear()-1)+'-04-01' : now.getFullYear()+'-04-01';
+  var fyEnd   = now.getMonth() < 3 ? now.getFullYear()+'-03-31'    : (now.getFullYear()+1)+'-03-31';
 
   Promise.all([
     xeroGet('https://api.xero.com/api.xro/2.0/Organisation'),
-    xeroGet('https://api.xero.com/api.xro/2.0/Invoices?Statuses=AUTHORISED,SUBMITTED&Type=ACCREC&where=AmountDue>0'),
-    xeroGet('https://api.xero.com/api.xro/2.0/Accounts?where=Type=="BANK"'),
-    xeroGet('https://api.xero.com/api.xro/2.0/Reports/ProfitAndLoss?fromDate=' + fyStart + '&toDate=' + fyEnd + '&periods=12&timeframe=MONTH'),
-    xeroGet('https://api.xero.com/api.xro/2.0/Invoices?Statuses=AUTHORISED,SUBMITTED&Type=ACCREC&where=Date>DateTime(' + fyStart.replace(/-/g,',') + ')'),
+    xeroGet('https://api.xero.com/api.xro/2.0/Invoices?Statuses=AUTHORISED&Type=ACCREC&where=AmountDue%3E0'),
+    xeroGet('https://api.xero.com/api.xro/2.0/Reports/ProfitAndLoss?fromDate='+fyStart+'&toDate='+fyEnd+'&periods=12&timeframe=MONTH'),
+    xeroGet('https://api.xero.com/api.xro/2.0/Invoices?Statuses=AUTHORISED,PAID&Type=ACCREC&where=Date%3EDateTime('+fyStart.replace(/-/g,',')+')'),
   ])
   .then(function(results) {
-    var org      = results[0].Organisations[0];
-    var invoices = results[1].Invoices || [];
-    var accounts = results[2].Accounts || [];
-    var pl       = results[3].Reports[0];
-    var allInv   = results[4].Invoices || [];
-
-    renderDashboard(org, invoices, accounts, pl, allInv, fyStart, fyEnd);
+    var org         = results[0].Organisations[0];
+    var invoices    = results[1].Invoices || [];
+    var pl          = results[2].Reports  ? results[2].Reports[0] : null;
+    var allInvoices = results[3].Invoices || [];
+    renderDashboard(org, invoices, pl, allInvoices, fyStart, fyEnd);
     showLoading(false);
     document.getElementById('connect-screen').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
   })
-  .catch(function(e) { showError('Could not load data: ' + e.message); });
+  .catch(function(e){ showError('Could not load data: ' + e.message); });
 }
 
 // ── RENDER ───────────────────────────────────────────────────
 
-function renderDashboard(org, overdueInvoices, bankAccounts, pl, allInvoices, fyStart, fyEnd) {
-  var now = new Date();
-
-  // Org name
-  document.getElementById('org-name').textContent = org.Name || 'Finance Dashboard';
-  document.getElementById('org-sub').textContent  = 'Financial overview · ' + org.CountryCode;
-  document.getElementById('dash-date').textContent = now.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
-  document.getElementById('dash-footer').textContent = (org.Name || '') + ' · Finance Dashboard · Data from Xero · ' + now.toLocaleDateString('en-GB');
-
+function renderDashboard(org, overdueInvoices, pl, allInvoices, fyStart, fyEnd) {
+  var now      = new Date();
   var currency = org.BaseCurrency || 'GBP';
 
-  // ── OVERDUE INVOICES ──
-  var overdue = overdueInvoices.filter(function(inv) {
+  document.getElementById('org-name').textContent  = org.Name || 'Finance Dashboard';
+  document.getElementById('org-sub').textContent   = 'Financial overview · ' + (org.CountryCode || '');
+  document.getElementById('dash-date').textContent = now.toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('dash-footer').textContent = (org.Name||'') + ' · Finance Dashboard · Data from Xero · ' + now.toLocaleDateString('en-GB');
+
+  // Overdue
+  var overdue = overdueInvoices.filter(function(inv){
     return inv.AmountDue > 0 && new Date(parseXeroDate(inv.DueDate)) < now;
   }).sort(function(a,b){ return parseXeroDate(a.DueDate) - parseXeroDate(b.DueDate); });
 
   var totalOverdue = overdue.reduce(function(s,inv){ return s + inv.AmountDue; }, 0);
   var oldestDays   = overdue.length > 0 ? Math.floor((now - new Date(parseXeroDate(overdue[0].DueDate))) / 86400000) : 0;
 
-  // ── P&L DATA ──
-  var plData    = parsePL(pl);
+  // P&L
+  var plData       = parsePL(pl);
   var totalIncome  = plData.income.reduce(function(s,v){ return s+v; }, 0);
   var totalExpense = plData.expense.reduce(function(s,v){ return s+v; }, 0);
   var netProfit    = totalIncome - totalExpense;
-  var burnRate     = totalExpense / plData.months;
-  var runway       = burnRate > 0 ? (totalIncome - totalExpense) / burnRate : 0;
+  var burnRate     = plData.months > 0 ? totalExpense / plData.months : 0;
 
-  // ── TOP CLIENTS ──
+  // Top clients
   var clientMap = {};
-  allInvoices.forEach(function(inv) {
+  allInvoices.forEach(function(inv){
     if (inv.Status === 'VOIDED' || inv.Status === 'DELETED') return;
     var name = inv.Contact && inv.Contact.Name ? inv.Contact.Name : 'Unknown';
-    clientMap[name] = (clientMap[name] || 0) + (inv.SubTotal || 0);
+    clientMap[name] = (clientMap[name]||0) + (inv.SubTotal||0);
   });
   var topClients = Object.keys(clientMap)
-    .map(function(k){ return { name: k, amount: clientMap[k] }; })
+    .map(function(k){ return {name:k, amount:clientMap[k]}; })
     .sort(function(a,b){ return b.amount - a.amount; })
-    .slice(0, 8);
+    .slice(0,8);
 
-  // ── KPIs ──
+  // KPIs
   document.getElementById('dash-kpis').innerHTML =
-    kpi('Total Income',    fmtCur(totalIncome, currency),   'Financial year to date', 'g') +
-    kpi('Total Expenses',  fmtCur(totalExpense, currency),  'Financial year to date', 'b') +
-    kpi('Net Position',    fmtCur(netProfit, currency),     netProfit >= 0 ? 'Surplus' : 'Deficit', netProfit >= 0 ? 'g' : 'r') +
-    kpi('Overdue',         fmtCur(totalOverdue, currency),  overdue.length + ' invoice' + (overdue.length !== 1 ? 's' : ''), overdue.length > 0 ? 'r' : 'g') +
-    kpi('Oldest Debt',     oldestDays > 0 ? oldestDays + ' days' : 'None', overdue.length > 0 ? overdue[0].Contact.Name : 'All invoices current', oldestDays > 60 ? 'r' : oldestDays > 30 ? 'a' : 'g');
+    kpi('Total Income',   fmtCur(totalIncome, currency),  'Financial year to date', 'g') +
+    kpi('Total Expenses', fmtCur(totalExpense, currency), 'Financial year to date', 'b') +
+    kpi('Net Position',   fmtCur(netProfit, currency),    netProfit >= 0 ? 'Surplus' : 'Deficit', netProfit >= 0 ? 'g' : 'r') +
+    kpi('Overdue',        fmtCur(totalOverdue, currency), overdue.length + ' invoice' + (overdue.length!==1?'s':''), overdue.length > 0 ? 'r' : 'g') +
+    kpi('Oldest Debt',    oldestDays > 0 ? oldestDays+' days' : 'None', overdue.length > 0 ? overdue[0].Contact.Name : 'All current', oldestDays > 60 ? 'r' : oldestDays > 30 ? 'a' : 'g');
 
-  // ── INCOME CHART ──
+  // Income chart
   if (chartIncome) chartIncome.destroy();
   chartIncome = new Chart(document.getElementById('income-chart').getContext('2d'), {
     type: 'bar',
     data: {
       labels: plData.labels,
       datasets: [
-        { label: 'Income',   data: plData.income,  backgroundColor: 'rgba(26,107,74,0.6)',  borderColor: 'rgba(26,107,74,0.9)',  borderWidth:0, borderRadius:3 },
-        { label: 'Expenses', data: plData.expense, backgroundColor: 'rgba(45,74,138,0.25)', borderColor: 'rgba(45,74,138,0.5)',  borderWidth:1, borderRadius:3 }
+        {label:'Income',   data:plData.income,  backgroundColor:'rgba(26,107,74,0.6)',  borderColor:'rgba(26,107,74,0.9)',  borderWidth:0, borderRadius:3},
+        {label:'Expenses', data:plData.expense, backgroundColor:'rgba(45,74,138,0.25)', borderColor:'rgba(45,74,138,0.5)',  borderWidth:1, borderRadius:3}
       ]
     },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { position:'bottom', labels:{ font:{ family:'DM Sans', size:11 }, padding:14 } },
-        tooltip: { callbacks:{ label:function(c){ return c.dataset.label+': '+fmtCur(c.parsed.y, currency); } } }
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'bottom',labels:{font:{family:'DM Sans',size:11},padding:14}},
+        tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+fmtCur(c.parsed.y,currency);}}}
       },
-      scales: {
-        x: { grid:{ display:false }, ticks:{ font:{ family:'DM Sans', size:10 } } },
-        y: { grid:{ color:'#f0ede8' }, ticks:{ font:{ family:'DM Sans', size:10 }, callback:function(v){ return fmtK(v, currency); } } }
+      scales:{
+        x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:10}}},
+        y:{grid:{color:'#f0ede8'},ticks:{font:{family:'DM Sans',size:10},callback:function(v){return fmtK(v,currency);}}}
       }
     }
   });
 
-  // ── TOP CLIENTS CHART ──
+  // Clients chart
   if (chartClients) chartClients.destroy();
   chartClients = new Chart(document.getElementById('clients-chart').getContext('2d'), {
     type: 'bar',
     data: {
-      labels: topClients.map(function(c){ return c.name.length > 18 ? c.name.substring(0,16)+'…' : c.name; }),
-      datasets: [{ data: topClients.map(function(c){ return c.amount; }), backgroundColor: 'rgba(45,74,138,0.65)', borderRadius: 4 }]
+      labels: topClients.map(function(c){ return c.name.length>18?c.name.substring(0,16)+'…':c.name; }),
+      datasets: [{data:topClients.map(function(c){return c.amount;}), backgroundColor:'rgba(45,74,138,0.65)', borderRadius:4}]
     },
-    options: {
-      indexAxis: 'y',
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks:{ label:function(c){ return fmtCur(c.parsed.x, currency); } } }
+    options:{
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:function(c){return fmtCur(c.parsed.x,currency);}}}
       },
-      scales: {
-        x: { grid:{ color:'#f0ede8' }, ticks:{ font:{ family:'DM Sans', size:10 }, callback:function(v){ return fmtK(v, currency); } } },
-        y: { grid:{ display:false }, ticks:{ font:{ family:'DM Sans', size:10 } } }
+      scales:{
+        x:{grid:{color:'#f0ede8'},ticks:{font:{family:'DM Sans',size:10},callback:function(v){return fmtK(v,currency);}}},
+        y:{grid:{display:false},ticks:{font:{family:'DM Sans',size:10}}}
       }
     }
   });
 
-  // ── OVERDUE TABLE ──
-  document.getElementById('overdue-sub').textContent = overdue.length + ' invoices · ' + fmtCur(totalOverdue, currency) + ' outstanding';
+  // Overdue table
+  document.getElementById('overdue-sub').textContent = overdue.length + ' invoices · ' + fmtCur(totalOverdue,currency) + ' outstanding';
   var overdueHtml = '';
   if (overdue.length === 0) {
     overdueHtml = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">✓ No overdue invoices</div>';
   } else {
-    overdue.slice(0, 8).forEach(function(inv) {
+    overdue.slice(0,8).forEach(function(inv){
       var days = Math.floor((now - new Date(parseXeroDate(inv.DueDate))) / 86400000);
       var cls  = days > 60 ? 'r' : 'a';
-      overdueHtml += '<div class="inv-row">' +
-        '<div><div class="inv-contact">' + esc(inv.Contact.Name) + '</div><div class="inv-ref">' + esc(inv.InvoiceNumber || '') + ' · Due ' + formatDate(parseXeroDate(inv.DueDate)) + '</div></div>' +
-        '<span class="inv-days ' + cls + '">' + days + 'd overdue</span>' +
-        '<div class="inv-amount">' + fmtCur(inv.AmountDue, currency) + '</div>' +
-        '</div>';
+      overdueHtml += '<div class="inv-row">'
+        + '<div><div class="inv-contact">'+esc(inv.Contact.Name)+'</div>'
+        + '<div class="inv-ref">'+esc(inv.InvoiceNumber||'')+' · Due '+formatDate(parseXeroDate(inv.DueDate))+'</div></div>'
+        + '<span class="inv-days '+cls+'">'+days+'d overdue</span>'
+        + '<div class="inv-amount">'+fmtCur(inv.AmountDue,currency)+'</div>'
+        + '</div>';
     });
   }
   document.getElementById('dash-overdue').innerHTML = overdueHtml;
 
-  // ── INSIGHTS ──
+  // Insights
   var insights = [];
+  if (totalOverdue > 0) insights.push({title:'Outstanding debt', text:fmtCur(totalOverdue,currency)+' overdue across '+overdue.length+' invoice'+(overdue.length!==1?'s':'')+'. Oldest is '+oldestDays+' days. Consider chasing this week.'});
+  if (netProfit > 0) insights.push({title:'Healthy position', text:'Showing a '+fmtCur(netProfit,currency)+' surplus for the financial year to date.'});
+  else if (netProfit < 0) insights.push({title:'Deficit position', text:'Expenses exceed income by '+fmtCur(Math.abs(netProfit),currency)+'. Review expenditure commitments.'});
+  if (topClients.length > 0 && totalIncome > 0) {
+    var topPct = (topClients[0].amount / totalIncome * 100).toFixed(0);
+    if (topPct > 30) insights.push({title:'Client concentration risk', text:topClients[0].name+' accounts for '+topPct+'% of income. High dependency on one client is a financial risk.'});
+  }
+  if (burnRate > 0) insights.push({title:'Monthly spend rate', text:'Average monthly expenditure is '+fmtCur(burnRate,currency)+'. Income covers '+Math.abs(totalIncome/burnRate).toFixed(1)+' months of costs.'});
 
-  if (totalOverdue > 0) {
-    insights.push({ title: 'Outstanding debt', text: fmtCur(totalOverdue, currency) + ' is overdue across ' + overdue.length + ' invoice' + (overdue.length!==1?'s':'') + '. Oldest is ' + oldestDays + ' days. Consider chasing these this week.' });
-  }
-  if (netProfit > 0) {
-    insights.push({ title: 'Healthy position', text: 'The organisation is showing a ' + fmtCur(netProfit, currency) + ' surplus for the financial year to date.' });
-  } else if (netProfit < 0) {
-    insights.push({ title: 'Deficit position', text: 'Expenses exceed income by ' + fmtCur(Math.abs(netProfit), currency) + ' for the year to date. Review expenditure commitments.' });
-  }
-  if (topClients.length > 0) {
-    var topPct = totalIncome > 0 ? (topClients[0].amount / totalIncome * 100).toFixed(0) : 0;
-    if (topPct > 30) {
-      insights.push({ title: 'Client concentration risk', text: topClients[0].name + ' accounts for ' + topPct + '% of income. High dependency on a single client represents a financial risk.' });
-    }
-  }
-  if (burnRate > 0) {
-    insights.push({ title: 'Monthly spend rate', text: 'Average monthly expenditure is ' + fmtCur(burnRate, currency) + '. At this rate the current income covers ' + Math.abs(runway).toFixed(1) + ' months of costs.' });
-  }
-
-  var insightsHtml = insights.slice(0,4).map(function(ins) {
-    return '<div class="insight"><div class="insight-title">' + esc(ins.title) + '</div><div class="insight-text">' + esc(ins.text) + '</div></div>';
-  }).join('');
-  document.getElementById('dash-insights').innerHTML = insightsHtml || '<div style="color:var(--muted);font-size:13px">Connect your Xero account to see insights.</div>';
+  document.getElementById('dash-insights').innerHTML = insights.slice(0,4).map(function(ins){
+    return '<div class="insight"><div class="insight-title">'+esc(ins.title)+'</div><div class="insight-text">'+esc(ins.text)+'</div></div>';
+  }).join('') || '<div style="color:var(--muted);font-size:13px;padding:10px 0">No insights available.</div>';
 }
 
 // ── P&L PARSER ───────────────────────────────────────────────
 
 function parsePL(report) {
-  var labels  = [];
-  var income  = [];
-  var expense = [];
-  var months  = 0;
+  var labels=[], income=[], expense=[], months=0;
+  if (!report || !report.Rows) return {labels:[],income:[],expense:[],months:1};
 
-  if (!report || !report.Rows) return { labels:[], income:[], expense:[], months:1 };
-
-  // Find column headers (month names)
-  report.Rows.forEach(function(section) {
-    if (section.RowType === 'Header' && section.Rows) {
-      section.Rows.forEach(function(row) {
+  report.Rows.forEach(function(section){
+    if (section.RowType==='Header' && section.Rows) {
+      section.Rows.forEach(function(row){
         if (row.Cells) {
-          row.Cells.forEach(function(cell, idx) {
-            if (idx > 0 && cell.Value && cell.Value !== 'Total') {
+          row.Cells.forEach(function(cell,idx){
+            if (idx>0 && cell.Value && cell.Value!=='Total') {
               labels.push(cell.Value.substring(0,3));
-              income.push(0);
-              expense.push(0);
-              months++;
+              income.push(0); expense.push(0); months++;
             }
           });
         }
@@ -475,85 +419,82 @@ function parsePL(report) {
     }
   });
 
-  // Find income and expense totals per month
-  report.Rows.forEach(function(section) {
+  report.Rows.forEach(function(section){
     if (!section.Rows) return;
-    var isIncome  = section.Title && section.Title.toLowerCase().indexOf('income') !== -1;
-    var isExpense = section.Title && (section.Title.toLowerCase().indexOf('expense') !== -1 || section.Title.toLowerCase().indexOf('cost') !== -1);
-
-    section.Rows.forEach(function(row) {
-      if (row.RowType === 'SummaryRow' && row.Cells) {
-        row.Cells.forEach(function(cell, idx) {
-          if (idx > 0 && idx <= months) {
-            var val = parseFloat((cell.Value || '0').replace(/[^0-9.-]/g,'')) || 0;
-            if (isIncome)  income[idx-1]  = Math.abs(val);
-            if (isExpense) expense[idx-1] = Math.abs(val);
+    var isInc = section.Title && section.Title.toLowerCase().indexOf('income')!== -1;
+    var isExp = section.Title && (section.Title.toLowerCase().indexOf('expense')!==-1 || section.Title.toLowerCase().indexOf('cost')!==-1);
+    section.Rows.forEach(function(row){
+      if (row.RowType==='SummaryRow' && row.Cells) {
+        row.Cells.forEach(function(cell,idx){
+          if (idx>0 && idx<=months) {
+            var val = parseFloat((cell.Value||'0').replace(/[^0-9.-]/g,''))||0;
+            if (isInc) income[idx-1]  = Math.abs(val);
+            if (isExp) expense[idx-1] = Math.abs(val);
           }
         });
       }
     });
   });
 
-  return { labels:labels, income:income, expense:expense, months: months || 1 };
+  return {labels:labels, income:income, expense:expense, months:months||1};
 }
 
 // ── XERO API ─────────────────────────────────────────────────
 
 function xeroGet(url) {
-  return fetch(url, {
-    headers: {
-      'Authorization': 'Bearer ' + accessToken,
-      'Xero-tenant-id': tenantId || '',
-      'Accept': 'application/json'
-    }
-  }).then(function(r) {
-    if (!r.ok) throw new Error('API error ' + r.status + ' for ' + url);
-    return r.json();
-  });
+  var headers = {
+    'Authorization': 'Bearer ' + accessToken,
+    'Accept': 'application/json'
+  };
+  if (tenantId) headers['Xero-tenant-id'] = tenantId;
+  return fetch(url, {headers:headers})
+    .then(function(r){
+      if (!r.ok) return r.text().then(function(t){ throw new Error('API '+r.status+': '+t.substring(0,200)); });
+      return r.json();
+    });
 }
 
-// ── PKCE HELPERS ─────────────────────────────────────────────
+// ── PKCE ─────────────────────────────────────────────────────
 
 function generateVerifier() {
-  var array = new Uint8Array(32);
-  crypto.getRandomValues(array);
-  return btoa(String.fromCharCode.apply(null, array)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+  var a = new Uint8Array(32);
+  crypto.getRandomValues(a);
+  return btoa(String.fromCharCode.apply(null,a)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
 }
 
 function generateChallenge(verifier) {
-  var encoder = new TextEncoder();
-  return crypto.subtle.digest('SHA-256', encoder.encode(verifier)).then(function(hash) {
-    return btoa(String.fromCharCode.apply(null, new Uint8Array(hash))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)).then(function(hash){
+    return btoa(String.fromCharCode.apply(null,new Uint8Array(hash))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
   });
 }
 
 // ── HELPERS ──────────────────────────────────────────────────
 
-function parseXeroDate(dateStr) {
-  if (!dateStr) return new Date();
-  var m = dateStr.match(/\/Date\((\d+)/);
-  return m ? new Date(parseInt(m[1])) : new Date(dateStr);
+function parseXeroDate(d) {
+  if (!d) return new Date();
+  var m = d.match(/\/Date\((\d+)/);
+  return m ? new Date(parseInt(m[1])) : new Date(d);
 }
 
 function formatDate(d) {
-  return d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
 }
 
 function fmtCur(n, currency) {
-  var sym = currency === 'GBP' ? '£' : currency === 'EUR' ? '€' : '$';
+  var sym = currency==='GBP'?'£':currency==='EUR'?'€':'$';
   var abs = Math.abs(n);
-  if (abs >= 1000000) return (n<0?'-':'') + sym + (abs/1000000).toFixed(2) + 'm';
-  if (abs >= 1000)    return (n<0?'-':'') + sym + Math.round(abs).toLocaleString();
-  return (n<0?'-':'') + sym + Math.round(abs);
+  if (abs>=1000000) return (n<0?'-':'')+sym+(abs/1000000).toFixed(2)+'m';
+  if (abs>=1000)    return (n<0?'-':'')+sym+Math.round(abs).toLocaleString();
+  return (n<0?'-':'')+sym+Math.round(abs);
 }
 
 function fmtK(v, currency) {
-  var sym = currency === 'GBP' ? '£' : currency === 'EUR' ? '€' : '$';
-  return sym + (Math.abs(v)/1000).toFixed(0) + 'k';
+  var sym = currency==='GBP'?'£':currency==='EUR'?'€':'$';
+  return sym+(Math.abs(v)/1000).toFixed(0)+'k';
 }
 
 function kpi(label, value, detail, color) {
-  return '<div class="kpi ' + color + '"><div class="kpi-l">' + label + '</div><div class="kpi-v">' + value + '</div><div class="kpi-d">' + detail + '</div></div>';
+  return '<div class="kpi '+color+'"><div class="kpi-l">'+label+'</div><div class="kpi-v">'+value+'</div><div class="kpi-d">'+detail+'</div></div>';
 }
 
 function esc(s) {
@@ -562,12 +503,8 @@ function esc(s) {
 
 function showLoading(msg) {
   var el = document.getElementById('loading');
-  if (msg) {
-    el.style.display = 'flex';
-    document.getElementById('loading-msg').innerHTML = msg;
-  } else {
-    el.style.display = 'none';
-  }
+  if (msg) { el.style.display='flex'; document.getElementById('loading-msg').innerHTML=msg; }
+  else el.style.display='none';
 }
 
 function showError(msg) {
@@ -576,11 +513,10 @@ function showError(msg) {
 }
 
 function disconnect() {
-  accessToken = null;
-  tenantId    = null;
+  accessToken=null; tenantId=null;
   sessionStorage.clear();
-  document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('connect-screen').style.display = 'flex';
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('connect-screen').style.display='flex';
 }
 </script>
 </body>
