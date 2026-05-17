@@ -114,7 +114,7 @@
       See your cash position, outstanding invoices, top clients and financial health at a glance.
       Read-only access — we never modify your data.
     </div>
-    <button class="connect-btn" onclick="connectXero()">Connect to Xero</button>
+    <button class="connect-btn" onclick="()">Connect to Xero</button>
     <div class="connect-note">
       Read-only access &middot; Data never leaves your browser &middot; Disconnect any time
     </div>
@@ -210,21 +210,22 @@ window.addEventListener('load', function() {
 function connectXero() {
   var verifier = generateVerifier();
   var state    = generateVerifier().substring(0, 16);
-
   sessionStorage.setItem('xero_verifier', verifier);
   sessionStorage.setItem('xero_state', state);
 
   generateChallenge(verifier).then(function(challenge) {
-    var url = 'https://login.xero.com/identity/connect/authorize?' +
-      'response_type=code' +
-      '&client_id=' + CLIENT_ID +
-      '&redirect_uri=' + encodeURIComponent(REDIRECT_URI) +
-      '&scope=' + encodeURIComponent(SCOPES) +
-      '&state=' + state +
-      '&code_challenge=' + challenge +
-      '&code_challenge_method=S256';
-
-    window.location.href = url;
+    var url = 'https://login.xero.com/identity/connect/authorize'
+      + '?response_type=code'
+      + '&client_id=' + CLIENT_ID
+      + '&redirect_uri=' + encodeURIComponent(REDIRECT_URI)
+      + '&scope=' + encodeURIComponent(SCOPES)
+      + '&state=' + state
+      + '&code_challenge=' + challenge
+      + '&code_challenge_method=S256';
+    
+    // Show URL before redirecting so we can check it
+    alert('About to redirect to:\n\n' + url);
+    // window.location.href = url;  // commented out for now
   });
 }
 
