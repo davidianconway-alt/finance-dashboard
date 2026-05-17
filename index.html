@@ -187,21 +187,15 @@ window.addEventListener('load', function() {
 // ── OAUTH ────────────────────────────────────────────────────
 
 function connectXero() {
-  var verifier = generateVerifier();
-  var state    = generateVerifier().substring(0, 16);
-  sessionStorage.setItem('xero_verifier', verifier);
+  var state = Math.random().toString(36).substring(2);
   sessionStorage.setItem('xero_state', state);
-  generateChallenge(verifier).then(function(challenge) {
-    var url = 'https://login.xero.com/identity/connect/authorize'
-      + '?response_type=code'
-      + '&client_id=' + CLIENT_ID
-      + '&redirect_uri=' + encodeURIComponent(REDIRECT_URI)
-      + '&scope=' + encodeURIComponent(SCOPES)
-      + '&state=' + state
-      + '&code_challenge=' + challenge
-      + '&code_challenge_method=S256';
-    window.location.href = url;
-  });
+  var url = 'https://login.xero.com/identity/connect/authorize'
+    + '?response_type=code'
+    + '&client_id=' + CLIENT_ID
+    + '&redirect_uri=' + encodeURIComponent(REDIRECT_URI)
+    + '&scope=' + encodeURIComponent(SCOPES)
+    + '&state=' + state;
+  window.location.href = url;
 }
 
 function exchangeToken(code, verifier) {
