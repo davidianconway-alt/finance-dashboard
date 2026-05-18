@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finance Dashboard 2</title>
+    <title>Finance Dashboard</title>
     <style>
         /* Minimal layout handling to switch views */
         body { font-family: system-ui, sans-serif; background: #f4f6f8; margin: 0; padding: 20px; }
@@ -44,109 +44,45 @@
 
 <script>
 // ==========================================
-// 1. CONFIGURATION (CLEANED)
+// 1. CONFIGURATION
 // ==========================================
-const CLIENT_ID = '21693752B1574D61BDE75CFB14CD18E4';
-const REDIRECT_URI = 'https://davidianconway-alt.github.io/finance-dashboard/';
-const PROXY_BASE = 'https://finance-dashboard-backend-4bs1.onrender.com';
+const PROXY_BASE = 'https://finance-dashboard-backend-4bs1.onrender.com'; 
+const REFRESH_TARGET = 'https://davidianconway-alt.github.io/finance-dashboard/';
 
 // ==========================================
-// 2. PKCE CRYPTO HELPER FUNCTIONS
+// 2. OAUTH FLOW (TRIGGERS BACKEND HANDSHAKE)
 // ==========================================
-function generateCodeVerifier() {
-    const array = new Uint32Array(56);
-    window.crypto.getRandomValues(array);
-    return Array.from(array, dec => ('0' + dec.toString(16)).substr(-2)).join('');
-}
-
-async function generateCodeChallenge(verifier) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(verifier);
-    const digest = await window.crypto.subtle.digest('SHA-256', data);
-    return btoa(String.fromCharCode(...new Uint8Array(digest)))
-        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+function connectXero() {
+    // Redirects browser straight to your Render backend to handle authentication securely
+    window.location.href = `${PROXY_BASE}/login`;
 }
 
 // ==========================================
-// 3. OAUTH FLOW (THE BUTTON TRIGGER)
+// 3. INITIALIZATION & RECOVERY FLOW
 // ==========================================
-async function connectXero() {
-    try {
-        const verifier = generateCodeVerifier();
-        sessionStorage.setItem('xero_code_verifier', verifier);
-        
-        const challenge = await generateCodeChallenge(verifier);
-        
-        // 🇺🇦 UPDATED FOR MARCH 2026 XERO MANDATORY GRANULAR SCOPES
-        const scopes = 'openid profile email accounting.invoices.read accounting.payments.read accounting.banktransactions.read accounting.manualjournals.read accounting.settings.read accounting.contacts.read';
-        
-        const uniqueState = Math.random().toString(36).substring(2);
-        sessionStorage.setItem('xero_auth_state', uniqueState);
-        
-        const authorizationUrl = `https://identity.xero.com/connect/authorize?` + new URLSearchParams({
-            response_type: 'code',
-            client_id: CLIENT_ID,
-            redirect_uri: REDIRECT_URI,
-            scope: scopes, // 👈 Passing the fresh granular permissions here
-            state: uniqueState,
-            prompt: 'select_account',
-            code_challenge: challenge,
-            code_challenge_method: 'S256'
-        });
-        
-        window.location.href = authorizationUrl;
-    } catch (err) {
-        console.error('Error starting connection:', err);
-        alert('Failed to initiate login flow.');
-    }
-}
-// ==========================================
-// 4. INITIALIZATION & RECOVERY FLOW
-// ==========================================
-window.addEventListener('DOMContentLoaded', async () => {
+window.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
+    const token = urlParams.get('token');
+    const orgName = urlParams.get('orgName');
     
-    if (code) {
+    // Check if backend redirect sent a fresh token back in the URL
+    if (token) {
+        sessionStorage.setItem('xero_access_token', token);
+        if (orgName) {
+            sessionStorage.setItem('xero_org_name', decodeURIComponent(orgName));
+        }
+        
+        // Clean up the address bar parameters for a clean presentation
         window.history.replaceState({}, document.title, window.location.pathname);
-        await exchangeCodeForToken(code);
+        showDashboard();
     } else if (sessionStorage.getItem('xero_access_token')) {
+        // Keeps user logged in if token is already active in this session
         showDashboard();
     }
 });
 
-async function exchangeCodeForToken(code) {
-    const verifier = sessionStorage.getItem('xero_code_verifier');
-    try {
-        const response = await fetch(`${PROXY_BASE}/callback`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code, verifier, redirect_uri: REDIRECT_URI })
-        });
-        const data = await response.json();
-        
-        if (data.status === 'success' || data.access_token) {
-            const accessToken = data.access_token || (data.tokens && data.tokens.access_token);
-            const refreshToken = data.refresh_token || (data.tokens && data.tokens.refresh_token);
-            const expiresIn = data.expires_in || (data.tokens && data.tokens.expires_in) || 3600;
-            const orgName = data.orgName || "Connected to Xero";
-
-            sessionStorage.setItem('xero_access_token', accessToken);
-            sessionStorage.setItem('xero_refresh_token', refreshToken);
-            sessionStorage.setItem('xero_expires_at', Date.now() + (expiresIn * 1000));
-            sessionStorage.setItem('xero_org_name', orgName);
-            
-            showDashboard();
-        } else {
-            alert('Token exchange failed: ' + data.message);
-        }
-    } catch (err) {
-        console.error('Error exchanging token:', err);
-    }
-}
-
 // ==========================================
-// 5. UI DISPLAY & DISCONNECT FUNCTIONS
+// 4. UI DISPLAY & DISCONNECT FUNCTIONS
 // ==========================================
 function showDashboard() {
     document.getElementById('connect-screen').style.display = 'none';
@@ -162,7 +98,7 @@ function showDashboard() {
 
 function disconnect() {
     sessionStorage.clear();
-    window.location.href = REDIRECT_URI; 
+    window.location.href = REFRESH_TARGET; 
 }
 </script>
 </body>
