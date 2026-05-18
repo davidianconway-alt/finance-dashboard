@@ -42,7 +42,8 @@
   </div>
 </div>
 
-// --- OAUTH FLOW ---
+<!-- --- OAUTH FLOW --- -->
+<script>
 async function connectXero() {
     const verifier = generateCodeVerifier();
     sessionStorage.setItem('xero_code_verifier', verifier);
@@ -59,12 +60,13 @@ async function connectXero() {
         redirect_uri: REDIRECT_URI,
         scope: scopes,
         state: uniqueState,
-        prompt: 'select_account', // 👈 This forces Xero to ask which user/organisation account to use!
+        prompt: 'select_account',
         code_challenge: challenge,
         code_challenge_method: 'S256'
     });
     
     window.location.href = authorizationUrl;
 }
+</script>
 </body>
 </html>
