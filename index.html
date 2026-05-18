@@ -43,29 +43,66 @@
 </div>
 
 <!-- --- OAUTH FLOW --- -->
+<!-- --- INITIALIZATION & RECOVERY FLOW --- -->
 <script>
-async function connectXero() {
-    const verifier = generateCodeVerifier();
-    sessionStorage.setItem('xero_code_verifier', verifier);
+window.addEventListener('DOMContentLoaded', async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
     
-    const challenge = await generateCodeChallenge(verifier);
-    const scopes = 'openid profile email accounting.transactions.read accounting.settings.read accounting.contacts.read';
+    if (code) {
+        // Clear query parameters from URL for clean tracking
+        window.history.replaceState({}, document.title, window.location.pathname);
+        await exchangeCodeForToken(code);
+    } else if (sessionStorage.getItem('xero_access_token')) {
+        showDashboard();
+    }
+});
+
+async function exchangeCodeForToken(code) {
+    const verifier = sessionStorage.getItem('xero_code_verifier');
+    try {
+        const response = await fetch(`${PROXY_BASE}/callback`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, verifier, redirect_uri: REDIRECT_URI })
+        });
+        const data = await response.json();
+        
+        if (data.status === 'success' || data.access_token) {
+            const accessToken = data.access_token || (data.tokens && data.tokens.access_token);
+            const refreshToken = data.refresh_token || (data.tokens && data.tokens.refresh_token);
+            const expiresIn = data.expires_in || (data.tokens && data.tokens.expires_in) || 3600;
+            const orgName = data.orgName || "Connected to Xero";
+
+            sessionStorage.setItem('xero_access_token', accessToken);
+            sessionStorage.setItem('xero_refresh_token', refreshToken);
+            sessionStorage.setItem('xero_expires_at', Date.now() + (expiresIn * 1000));
+            sessionStorage.setItem('xero_org_name', orgName);
+            
+            showDashboard();
+        } else {
+            alert('Token exchange failed: ' + data.message);
+        }
+    } catch (err) {
+        console.error('Error exchanging token:', err);
+    }
+}
+
+function showDashboard() {
+    document.getElementById('connect-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
     
-    const uniqueState = Math.random().toString(36).substring(2);
-    sessionStorage.setItem('xero_auth_state', uniqueState);
-    
-    const authorizationUrl = `https://identity.xero.com/connect/authorize?` + new URLSearchParams({
-        response_type: 'code',
-        client_id: CLIENT_ID,
-        redirect_uri: REDIRECT_URI,
-        scope: scopes,
-        state: uniqueState,
-        prompt: 'select_account',
-        code_challenge: challenge,
-        code_challenge_method: 'S256'
-    });
-    
-    window.location.href = authorizationUrl;
+    const storedName = sessionStorage.getItem('xero_org_name');
+    if (storedName) {
+        document.getElementById('org-name').innerText = storedName;
+    } else {
+        document.getElementById('org-name').innerText = "Connected to Xero";
+    }
+}
+
+function disconnect() {
+    sessionStorage.clear();
+    window.location.href = REDIRECT_URI; 
 }
 </script>
 </body>
