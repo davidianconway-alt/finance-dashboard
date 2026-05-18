@@ -1,433 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Finance Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<style>
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-  :root{
-    --ink:#1a1a2e;--soft:#4a4a6a;--muted:#8888aa;
-    --paper:#f8f7f4;--card:#fff;--border:#e8e5e0;
-    --green:#1a6b4a;--gbg:#e8f5ee;
-    --amber:#8a5c00;--abg:#fff8e6;
-    --red:#8a1a1a;--rbg:#fdeaea;
-    --accent:#2d4a8a;
-  }
-  body{background:var(--paper);font-family:'DM Sans',sans-serif;color:var(--ink);min-height:100vh;}
-
-  .connect-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;}
-  .connect-logo{font-family:'DM Serif Display',serif;font-size:32px;color:var(--ink);margin-bottom:8px;}
-  .connect-tag{font-size:14px;color:var(--muted);margin-bottom:48px;text-align:center;}
-  .connect-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:48px 40px;max-width:480px;width:100%;text-align:center;}
-  .connect-icon{font-size:48px;margin-bottom:16px;}
-  .connect-title{font-family:'DM Serif Display',serif;font-size:24px;margin-bottom:10px;}
-  .connect-sub{font-size
-
-  .grid{display:grid;gap:16px;margin-bottom:16px;}
-  .g2{grid-template-columns:1fr 1fr;}
-  .g32{grid-template-columns:3fr 2fr;}
-  @media(max-width:768px){.g2,.g32{grid-template-columns:1fr;}}
-
-  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
-  .ch{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
-  .ct{font-family:'DM Serif Display',serif;font-size:14px;font-weight:400;}
-  .cs{font-size:11px;color:var(--muted);}
-  .cb{padding:18px;}
-
-  .inv-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid #f5f2ed;gap:12px;font-size:13px;}
-  .inv-row:last-child{border-bottom:none;}
-  .inv-contact{flex:1;color:var(--ink);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .inv-ref{font-size:11px;color:var(--muted);}
-  .inv-days{font-size:11px;padding:2px 8px;border-radius:20px;flex-shrink:0;}
-  .inv-days.r{background:var(--rbg);color:var(--red);}
-  .inv-days.a{background:var(--abg);color:var(--amber);}
-  .inv-amount{font-weight:600;flex-shrink:0;min-width:80px;text-align:right;}
-
-  .insight{background:var(--paper);border-radius:8px;padding:14px;margin-bottom:10px;border:1px solid var(--border);}
-  .insight:last-child{margin-bottom:0;}
-  .insight-title{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:4px;}
-  .insight-text{font-size:12px;color:var(--soft);line-height:1.5;}
-
-  .cw{position:relative;height:220px;}
-  .footer{text-align:center;font-size:11px;color:var(--muted);padding:16px 32px 28px;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Dashboard</title>
+    <style>
+        /* Minimal layout handling to switch views */
+        body { font-family: system-ui, sans-serif; background: #f4f6f8; margin: 0; padding: 20px; }
+        .connect-screen { display: block; max-width: 500px; margin: 100px auto; text-align: center; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .dashboard { display: none; max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .connect-btn { background: #00b7e2; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .hbtn { background: #ff4d4d; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+    </style>
 </head>
 <body>
 
-<div class="loading-screen" id="loading">
-  <div class="spinner"></div>
-  <div id="loading-msg">Connecting to Xero&hellip;</div>
-</div>
-
+<!-- 1. CONNECT VIEW -->
 <div class="connect-screen" id="connect-screen">
-  <div class="connect-logo">Finance Dashboard</div>
-  <div class="connect-tag">Instant financial clarity — powered by your Xero data</div>
+  <div class="connect-logo" style="font-size: 24px; font-weight: bold;">Finance Dashboard</div>
+  <p class="connect-tag">Instant financial clarity — powered by your Xero data</p>
   <div class="connect-box">
-    <div class="connect-icon">📊</div>
-    <div class="connect-title">Connect your Xero account</div>
-    <div class="connect-sub">See your cash position, outstanding invoices, top clients and financial health at a glance. Read-only access — we never modify your data.</div>
+    <p class="connect-sub">See your cash position, outstanding invoices, and financial health at a glance.</p>
     <button class="connect-btn" onclick="connectXero()">Connect to Xero</button>
-    <div class="connect-note">Read-only access &middot; Data never leaves your browser &middot; Disconnect any time</div>
-    <div class="connect-features">
-      <div class="feature"><div class="feature-title">Cash position</div><div class="feature-desc">Live bank balance across all accounts</div></div>
-      <div class="feature"><div class="feature-title">Overdue invoices</div><div class="feature-desc">Who owes you and for how long</div></div>
-      <div class="feature"><div class="feature-title">Top clients</div><div class="feature-desc">Revenue by contact this year</div></div>
-      <div class="feature"><div class="feature-title">Burn rate</div><div class="feature-desc">Monthly spend at current rate</div></div>
-    </div>
+    <p style="font-size: 12px; color: #666; margin-top: 20px;">Read-only access &middot; Secured via private proxy &middot; Disconnect any time</p>
   </div>
 </div>
 
+<!-- 2. DASHBOARD VIEW -->
 <div class="dashboard" id="dashboard">
-  <div class="header">
-    <div class="header-left">
-      <h1 id="org-name">Finance Dashboard</h1>
-      <p id="org-sub">Financial overview</p>
+  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 20px;">
+    <div>
+      <h1 id="org-name">Loading Organisation...</h1>
+      <p id="org-sub">Financial Overview</p>
     </div>
-    <div class="header-right">
-      <span class="hpill" id="dash-date"></span>
+    <div>
       <button class="hbtn" onclick="disconnect()">Disconnect</button>
     </div>
   </div>
-  <div class="main">
-    <div class="kpis" id="dash-kpis"></div>
-    <div class="grid g32">
-      <div class="card">
-        <div class="ch"><div class="ct">Income vs Expenditure</div><div class="cs">Current financial year by month</div></div>
-        <div class="cb"><div class="cw"><canvas id="income-chart"></canvas></div></div>
-      </div>
-      <div class="card">
-        <div class="ch"><div class="ct">Key Insights</div><div class="cs">Auto-generated from your data</div></div>
-        <div class="cb" id="dash-insights"></div>
-      </div>
-    </div>
-    <div class="grid g2">
-      <div class="card">
-        <div class="ch"><div class="ct">Overdue Invoices</div><div class="cs" id="overdue-sub"></div></div>
-        <div class="cb" id="dash-overdue"></div>
-      </div>
-      <div class="card">
-        <div class="ch"><div class="ct">Top Clients by Revenue</div><div class="cs">Current financial year</div></div>
-        <div class="cb"><div class="cw"><canvas id="clients-chart"></canvas></div></div>
-      </div>
-    </div>
+  <div style="margin-top: 20px;">
+     <h3>Your Live Financial KPIs will render here.</h3>
   </div>
-  <div class="footer" id="dash-footer"></div>
 </div>
 
 <script>
-// ── CONFIG ───────────────────────────────────────────────────
-var CLIENT_ID    = '5E197D833633444883E0B870D34C01C6';
-var REDIRECT_URI = 'https://davidianconway-alt.github.io/finance-dashboard/';
-var BACKEND      = 'https://finance-dashboard-backend-4bs1.onrender.com';
-var SCOPES       = 'openid profile email accounting.invoices.read accounting.payments.read accounting.settings.read accounting.contacts.read offline_access';
+// --- CONFIGURATION ---
+const CLIENT_ID = 'YOUR_XERO_CLIENT_ID'; // Replace with your actual Xero Client ID
+const REDIRECT_URI = 'https://YOUR-GITHUB-USERNAME.github.io/YOUR-REPO-NAME/'; 
+const PROXY_BASE = 'https://YOUR-RENDER-APP-NAME.onrender.com'; // Your live Render URL
 
-// ── STATE ────────────────────────────────────────────────────
-var accessToken  = null;
-var tenantId     = null;
-var chartIncome  = null;
-var chartClients = null;
+// --- PKCE HELPER FUNCTIONS ---
+function generateCodeVerifier() {
+    const array = new Uint32Array(56);
+    window.crypto.getRandomValues(array);
+    return Array.from(array, dec => ('0' + dec.toString(16)).substr(-2)).join('');
+}
 
-// ── ON LOAD ──────────────────────────────────────────────────
-window.addEventListener('load', function() {
-  var params = new URLSearchParams(window.location.search);
-  var code   = params.get('code');
-  var state  = params.get('state');
+async function generateCodeChallenge(verifier) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(verifier);
+    const digest = await window.crypto.subtle.digest('SHA-256', data);
+    return btoa(String.fromCharCode(...new Uint8Array(digest)))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
 
-  if (code) {
-    var savedState = sessionStorage.getItem('xero_state');
-    var verifier   = sessionStorage.getItem('xero_verifier');
-    if (state !== savedState) {
-      showError('Security check failed. Please try connecting again.');
-      return;
+// --- OAUTH FLOW ---
+async function connectXero() {
+    const verifier = generateCodeVerifier();
+    sessionStorage.setItem('xero_code_verifier', verifier);
+    
+    const challenge = await generateCodeChallenge(verifier);
+    const scopes = 'openid profile email accounting.transactions.read accounting.settings.read accounting.contacts.read';
+    
+    const authorizationUrl = `https://identity.xero.com/connect/authorize?` + new URLSearchParams({
+        response_type: 'code',
+        client_id: CLIENT_ID,
+        redirect_uri: REDIRECT_URI,
+        scope: scopes,
+        code_challenge: challenge,
+        code_challenge_method: 'S256'
+    });
+    
+    window.location.href = authorizationUrl;
+}
+
+// --- INITIALIZATION HANDLER ---
+window.addEventListener('DOMContentLoaded', async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    
+    if (code) {
+        // Clear query parameters from URL clean looking tracking
+        window.history.replaceState({}, document.title, window.location.pathname);
+        await exchangeCodeForToken(code);
+    } else if (sessionStorage.getItem('xero_access_token')) {
+        showDashboard();
     }
-    window.history.replaceState({}, document.title, window.location.pathname);
-    showLoading('Exchanging token&hellip;');
-    exchangeToken(code, verifier);
-  }
 });
 
-// ── OAUTH PKCE ───────────────────────────────────────────────
-
-function connectXero() {
-  var verifier = generateVerifier();
-  var state    = generateVerifier().substring(0, 16);
-  sessionStorage.setItem('xero_verifier', verifier);
-  sessionStorage.setItem('xero_state', state);
-
-  generateChallenge(verifier).then(function(challenge) {
-    var url = 'https://login.xero.com/identity/connect/authorize'
-      + '?response_type=code'
-      + '&client_id=' + CLIENT_ID
-      + '&redirect_uri=' + encodeURIComponent(REDIRECT_URI)
-      + '&scope=' + encodeURIComponent(SCOPES)
-      + '&state=' + state
-      + '&code_challenge=' + challenge
-      + '&code_challenge_method=S256';
-
-    // DEBUG: show URL on page so it can be copied
-    document.getElementById('connect-screen').innerHTML = '<div style="padding:40px;max-width:800px;margin:0 auto;">'
-      + '<h2 style="font-family:DM Serif Display,serif;margin-bottom:16px;">Debug — Xero Auth URL</h2>'
-      + '<p style="font-size:13px;color:#666;margin-bottom:12px;">Copy this URL and paste it to check the parameters:</p>'
-      + '<textarea style="width:100%;height:120px;font-size:11px;padding:10px;border:1px solid #ddd;border-radius:6px;font-family:monospace;">' + url + '</textarea>'
-      + '<br><br><button onclick="window.location.href=\'' + url.replace(/'/g,"\'") + '\'">Proceed to Xero →</button>'
-      + '</div>';
-  });
-}
-
-function exchangeToken(code, verifier) {
-  // Token exchange happens on backend — secret never exposed here
-  fetch(BACKEND + '/auth/token', {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify({ code: code, code_verifier: verifier })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data) {
-    if (data.access_token) {
-      accessToken = data.access_token;
-      getTenants();
-    } else {
-      showError('Could not get access token: ' + (data.error_description || data.error || JSON.stringify(data)));
+async function exchangeCodeForToken(code) {
+    const verifier = sessionStorage.getItem('xero_code_verifier');
+    try {
+        const response = await fetch(`${PROXY_BASE}/api/token`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, verifier, redirect_uri: REDIRECT_URI })
+        });
+        const tokens = await response.json();
+        
+        if(tokens.access_token) {
+            storeTokens(tokens);
+            await fetchTenantId();
+            showDashboard();
+        }
+    } catch (err) {
+        console.error('Error exchanging token:', err);
     }
-  })
-  .catch(function(e){ showError('Token exchange failed: ' + e.message); });
 }
 
-function getTenants() {
-  showLoading('Getting organisations&hellip;');
-  backendPost('/api/connections', { token: accessToken })
-  .then(function(tenants) {
-    if (!tenants || tenants.length === 0) {
-      showError('No Xero organisations found.');
-      return;
+function storeTokens(tokens) {
+    sessionStorage.setItem('xero_access_token', tokens.access_token);
+    sessionStorage.setItem('xero_refresh_token', tokens.refresh_token);
+    sessionStorage.setItem('xero_expires_at', Date.now() + (tokens.expires_in * 1000));
+}
+
+// --- SECURE DATA FETCHING & AUTO-REFRESH ---
+async function getXeroData(url) {
+    let expiresAt = sessionStorage.getItem('xero_expires_at');
+    let token = sessionStorage.getItem('xero_access_token');
+    
+    // Auto-refresh token if it's within 30 seconds of expiring
+    if (Date.now() > (expiresAt - 30000)) {
+        const refreshToken = sessionStorage.getItem('xero_refresh_token');
+        const response = await fetch(`${PROXY_BASE}/api/refresh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token: refreshToken })
+        });
+        const tokens = await response.json();
+        storeTokens(tokens);
+        token = tokens.access_token;
     }
-    tenantId = tenants[0].tenantId;
-    loadDashboard();
-  })
-  .catch(function(e){ showError('Could not get organisations: ' + e.message); });
+
+    const tenantId = sessionStorage.getItem('xero_tenant_id');
+    const proxyResponse = await fetch(`${PROXY_BASE}/api/xero-proxy`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url, token, tenantId })
+    });
+    return await proxyResponse.json();
 }
 
-// ── LOAD DATA ────────────────────────────────────────────────
+async function fetchTenantId() {
+    const token = sessionStorage.getItem('xero_access_token');
+    const response = await fetch(`${PROXY_BASE}/api/xero-proxy`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: 'https://api.xero.com/connections', token })
+    });
+    const connections = await response.json();
+    if(connections && connections.length > 0) {
+        sessionStorage.setItem('xero_tenant_id', connections[0].tenantId);
+    }
+}
 
-function loadDashboard() {
-  showLoading('Loading your financial data&hellip;');
-  var now     = new Date();
-  var fyStart = now.getMonth() < 3 ? (now.getFullYear()-1)+'-04-01' : now.getFullYear()+'-04-01';
-  var fyEnd   = now.getMonth() < 3 ? now.getFullYear()+'-03-31'    : (now.getFullYear()+1)+'-03-31';
-
-  Promise.all([
-    xeroGet('https://api.xero.com/api.xro/2.0/Organisation'),
-    xeroGet('https://api.xero.com/api.xro/2.0/Invoices?Statuses=AUTHORISED&Type=ACCREC&where=AmountDue%3E0'),
-    xeroGet('https://api.xero.com/api.xro/2.0/Reports/ProfitAndLoss?fromDate='+fyStart+'&toDate='+fyEnd+'&periods=12&timeframe=MONTH'),
-    xeroGet('https://api.xero.com/api.xro/2.0/Invoices?Statuses=AUTHORISED,PAID&Type=ACCREC&where=Date%3EDateTime('+fyStart.replace(/-/g,',')+')'),
-  ])
-  .then(function(results) {
-    var org         = results[0].Organisations[0];
-    var invoices    = results[1].Invoices || [];
-    var pl          = results[2].Reports ? results[2].Reports[0] : null;
-    var allInvoices = results[3].Invoices || [];
-    renderDashboard(org, invoices, pl, allInvoices);
-    showLoading(false);
+async function showDashboard() {
     document.getElementById('connect-screen').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
-  })
-  .catch(function(e){ showError('Could not load data: ' + e.message); });
-}
-
-// ── RENDER ───────────────────────────────────────────────────
-
-function renderDashboard(org, overdueInvoices, pl, allInvoices) {
-  var now      = new Date();
-  var currency = org.BaseCurrency || 'GBP';
-
-  document.getElementById('org-name').textContent  = org.Name || 'Finance Dashboard';
-  document.getElementById('org-sub').textContent   = 'Financial overview · ' + (org.CountryCode || '');
-  document.getElementById('dash-date').textContent = now.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  document.getElementById('dash-footer').textContent = (org.Name||'') + ' · Finance Dashboard · Data from Xero · ' + now.toLocaleDateString('en-GB');
-
-  // Overdue
-  var overdue = overdueInvoices.filter(function(inv){
-    return inv.AmountDue > 0 && new Date(parseXeroDate(inv.DueDate)) < now;
-  }).sort(function(a,b){ return parseXeroDate(a.DueDate) - parseXeroDate(b.DueDate); });
-
-  var totalOverdue = overdue.reduce(function(s,inv){ return s+inv.AmountDue; }, 0);
-  var oldestDays   = overdue.length > 0 ? Math.floor((now - new Date(parseXeroDate(overdue[0].DueDate)))/86400000) : 0;
-
-  // P&L
-  var plData       = parsePL(pl);
-  var totalIncome  = plData.income.reduce(function(s,v){ return s+v; }, 0);
-  var totalExpense = plData.expense.reduce(function(s,v){ return s+v; }, 0);
-  var netProfit    = totalIncome - totalExpense;
-  var burnRate     = plData.months > 0 ? totalExpense/plData.months : 0;
-
-  // Top clients
-  var clientMap = {};
-  allInvoices.forEach(function(inv){
-    if (inv.Status==='VOIDED'||inv.Status==='DELETED') return;
-    var name = inv.Contact&&inv.Contact.Name ? inv.Contact.Name : 'Unknown';
-    clientMap[name] = (clientMap[name]||0) + (inv.SubTotal||0);
-  });
-  var topClients = Object.keys(clientMap)
-    .map(function(k){ return {name:k,amount:clientMap[k]}; })
-    .sort(function(a,b){ return b.amount-a.amount; })
-    .slice(0,8);
-
-  // KPIs
-  document.getElementById('dash-kpis').innerHTML =
-    kpi('Total Income',   fmtCur(totalIncome,currency),  'Financial year to date','g') +
-    kpi('Total Expenses', fmtCur(totalExpense,currency), 'Financial year to date','b') +
-    kpi('Net Position',   fmtCur(netProfit,currency),    netProfit>=0?'Surplus':'Deficit', netProfit>=0?'g':'r') +
-    kpi('Overdue',        fmtCur(totalOverdue,currency), overdue.length+' invoice'+(overdue.length!==1?'s':''), overdue.length>0?'r':'g') +
-    kpi('Oldest Debt',    oldestDays>0?oldestDays+' days':'None', overdue.length>0?overdue[0].Contact.Name:'All current', oldestDays>60?'r':oldestDays>30?'a':'g');
-
-  // Income chart
-  if (chartIncome) chartIncome.destroy();
-  chartIncome = new Chart(document.getElementById('income-chart').getContext('2d'),{
-    type:'bar',
-    data:{labels:plData.labels,datasets:[
-      {label:'Income',  data:plData.income,  backgroundColor:'rgba(26,107,74,0.6)', borderColor:'rgba(26,107,74,0.9)', borderWidth:0,borderRadius:3},
-      {label:'Expenses',data:plData.expense, backgroundColor:'rgba(45,74,138,0.25)',borderColor:'rgba(45,74,138,0.5)',borderWidth:1,borderRadius:3}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom',labels:{font:{family:'DM Sans',size:11},padding:14}},
-        tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+fmtCur(c.parsed.y,currency);}}}},
-      scales:{x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:10}}},
-        y:{grid:{color:'#f0ede8'},ticks:{font:{family:'DM Sans',size:10},callback:function(v){return fmtK(v,currency);}}}}}
-  });
-
-  // Clients chart
-  if (chartClients) chartClients.destroy();
-  chartClients = new Chart(document.getElementById('clients-chart').getContext('2d'),{
-    type:'bar',
-    data:{labels:topClients.map(function(c){return c.name.length>18?c.name.substring(0,16)+'…':c.name;}),
-      datasets:[{data:topClients.map(function(c){return c.amount;}),backgroundColor:'rgba(45,74,138,0.65)',borderRadius:4}]},
-    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return fmtCur(c.parsed.x,currency);}}}},
-      scales:{x:{grid:{color:'#f0ede8'},ticks:{font:{family:'DM Sans',size:10},callback:function(v){return fmtK(v,currency);}}},
-        y:{grid:{display:false},ticks:{font:{family:'DM Sans',size:10}}}}}
-  });
-
-  // Overdue table
-  document.getElementById('overdue-sub').textContent = overdue.length+' invoices · '+fmtCur(totalOverdue,currency)+' outstanding';
-  var overdueHtml = '';
-  if (overdue.length===0) {
-    overdueHtml='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">✓ No overdue invoices</div>';
-  } else {
-    overdue.slice(0,8).forEach(function(inv){
-      var days=Math.floor((now-new Date(parseXeroDate(inv.DueDate)))/86400000);
-      var cls=days>60?'r':'a';
-      overdueHtml+='<div class="inv-row">'
-        +'<div><div class="inv-contact">'+esc(inv.Contact.Name)+'</div>'
-        +'<div class="inv-ref">'+esc(inv.InvoiceNumber||'')+' · Due '+formatDate(parseXeroDate(inv.DueDate))+'</div></div>'
-        +'<span class="inv-days '+cls+'">'+days+'d overdue</span>'
-        +'<div class="inv-amount">'+fmtCur(inv.AmountDue,currency)+'</div>'
-        +'</div>';
-    });
-  }
-  document.getElementById('dash-overdue').innerHTML = overdueHtml;
-
-  // Insights
-  var insights=[];
-  if (totalOverdue>0) insights.push({title:'Outstanding debt',text:fmtCur(totalOverdue,currency)+' overdue across '+overdue.length+' invoice'+(overdue.length!==1?'s':'')+'. Oldest is '+oldestDays+' days.'});
-  if (netProfit>0) insights.push({title:'Healthy position',text:'Showing a '+fmtCur(netProfit,currency)+' surplus for the financial year to date.'});
-  else if (netProfit<0) insights.push({title:'Deficit position',text:'Expenses exceed income by '+fmtCur(Math.abs(netProfit),currency)+'. Review expenditure commitments.'});
-  if (topClients.length>0&&totalIncome>0){
-    var topPct=(topClients[0].amount/totalIncome*100).toFixed(0);
-    if (topPct>30) insights.push({title:'Client concentration risk',text:topClients[0].name+' accounts for '+topPct+'% of income.'});
-  }
-  if (burnRate>0) insights.push({title:'Monthly spend rate',text:'Average monthly expenditure is '+fmtCur(burnRate,currency)+'.'});
-
-  document.getElementById('dash-insights').innerHTML=insights.slice(0,4).map(function(ins){
-    return '<div class="insight"><div class="insight-title">'+esc(ins.title)+'</div><div class="insight-text">'+esc(ins.text)+'</div></div>';
-  }).join('')||'<div style="color:var(--muted);font-size:13px">No insights available.</div>';
-}
-
-// ── P&L PARSER ───────────────────────────────────────────────
-
-function parsePL(report) {
-  var labels=[],income=[],expense=[],months=0;
-  if (!report||!report.Rows) return {labels:[],income:[],expense:[],months:1};
-  report.Rows.forEach(function(section){
-    if (section.RowType==='Header'&&section.Rows) {
-      section.Rows.forEach(function(row){
-        if (row.Cells) row.Cells.forEach(function(cell,idx){
-          if (idx>0&&cell.Value&&cell.Value!=='Total'){labels.push(cell.Value.substring(0,3));income.push(0);expense.push(0);months++;}
-        });
-      });
-    }
-  });
-  report.Rows.forEach(function(section){
-    if (!section.Rows) return;
-    var isInc=section.Title&&section.Title.toLowerCase().indexOf('income')!==-1;
-    var isExp=section.Title&&(section.Title.toLowerCase().indexOf('expense')!==-1||section.Title.toLowerCase().indexOf('cost')!==-1);
-    section.Rows.forEach(function(row){
-      if (row.RowType==='SummaryRow'&&row.Cells) row.Cells.forEach(function(cell,idx){
-        if (idx>0&&idx<=months){
-          var val=parseFloat((cell.Value||'0').replace(/[^0-9.-]/g,''))||0;
-          if (isInc) income[idx-1]=Math.abs(val);
-          if (isExp) expense[idx-1]=Math.abs(val);
+    
+    // Fetch and display Organisation Name as proof of life!
+    try {
+        const orgData = await getXeroData('https://api.xero.com/api.xro/2.0/Organisation');
+        if(orgData && orgData.Organisations) {
+            document.getElementById('org-name').innerText = orgData.Organisations[0].Name;
         }
-      });
-    });
-  });
-  return {labels:labels,income:income,expense:expense,months:months||1};
+    } catch(err) {
+        document.getElementById('org-name').innerText = "Connected to Xero";
+    }
 }
 
-// ── API HELPERS ───────────────────────────────────────────────
-
-function xeroGet(url) {
-  return backendPost('/api/xero-proxy', {url:url, token:accessToken, tenantId:tenantId});
+function disconnect() {
+    sessionStorage.clear();
+    window.location.href = window.location.pathname; 
 }
-
-function backendPost(path, body) {
-  return fetch(BACKEND + path, {
-    method:  'POST',
-    headers: {'Content-Type':'application/json'},
-    body:    JSON.stringify(body)
-  }).then(function(r){
-    if (!r.ok) return r.text().then(function(t){ throw new Error('Backend '+r.status+': '+t.substring(0,200)); });
-    return r.json();
-  });
-}
-
-// ── PKCE ─────────────────────────────────────────────────────
-
-function generateVerifier() {
-  var a=new Uint8Array(32);
-  crypto.getRandomValues(a);
-  return btoa(String.fromCharCode.apply(null,a)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
-}
-
-function generateChallenge(verifier) {
-  return crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier)).then(function(hash){
-    return btoa(String.fromCharCode.apply(null,new Uint8Array(hash))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
-  });
-}
-
-// ── HELPERS ──────────────────────────────────────────────────
-
-function parseXeroDate(d){
-  if(!d) return new Date();
-  var m=d.match(/\/Date\((\d+)/);
-  return m?new Date(parseInt(m[1])):new Date(d);
-}
-function formatDate(d){return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
-function fmtCur(n,currency){
-  var sym=currency==='GBP'?'£':currency==='EUR'?'€':'$';
-  var abs=Math.abs(n);
-  if(abs>=1000000) return (n<0?'-':'')+sym+(abs/1000000).toFixed(2)+'m';
-  if(abs>=1000)    return (n<0?'-':'')+sym+Math.round(abs).toLocaleString();
-  return (n<0?'-':'')+sym+Math.round(abs);
-}
-function fmtK(v,currency){var sym=currency==='GBP'?'£':currency==='EUR'?'€':'$';return sym+(Math.abs(v)/1000).toFixed(0)+'k';}
-function kpi(label,value,detail,color){return '<div class="kpi '+color+'"><div class="kpi-l">'+label+'</div><div class="kpi-v">'+value+'</div><div class="kpi-d">'+detail+'</div></div>';}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function showLoading(msg){var el=document.getElementById('loading');if(msg){el.style.display='flex';document.getElementById('loading-msg').innerHTML=msg;}else el.style.display='none';}
-function showError(msg){showLoading(false);alert(msg);}
-function disconnect(){accessToken=null;tenantId=null;sessionStorage.clear();document.getElementById('dashboard').style.display='none';document.getElementById('connect-screen').style.display='flex';}
 </script>
 </body>
 </html>
