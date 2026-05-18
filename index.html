@@ -50,7 +50,6 @@ async function connectXero() {
     const challenge = await generateCodeChallenge(verifier);
     const scopes = 'openid profile email accounting.transactions.read accounting.settings.read accounting.contacts.read';
     
-    // We create a random state variable to force Xero to process a unique request sequence
     const uniqueState = Math.random().toString(36).substring(2);
     sessionStorage.setItem('xero_auth_state', uniqueState);
     
@@ -59,7 +58,8 @@ async function connectXero() {
         client_id: CLIENT_ID,
         redirect_uri: REDIRECT_URI,
         scope: scopes,
-        state: uniqueState, // 👈 Added state here to force request evaluation
+        state: uniqueState,
+        prompt: 'select_account', // 👈 This forces Xero to ask which user/organisation account to use!
         code_challenge: challenge,
         code_challenge_method: 'S256'
     });
