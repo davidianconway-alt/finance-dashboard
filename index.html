@@ -44,9 +44,9 @@
 
 <script>
 // --- CONFIGURATION ---
-const CLIENT_ID = 'C3435A33D6774B529EFFC4857FAF03D5'; // Replace with your actual Xero Client ID
+const CLIENT_ID = 'C3435A33D6774B529EFFC4857FAF03D5'; 
 const REDIRECT_URI = 'https://davidianconway-alt.github.io/finance-dashboard/'; 
-const PROXY_BASE = 'https://finance-dashboard-backend-4bs1.onrender.com'; // Your live Render URL
+const PROXY_BASE = 'https://finance-dashboard-backend-4bs1.onrender.com'; 
 
 // --- PKCE HELPER FUNCTIONS ---
 function generateCodeVerifier() {
@@ -89,7 +89,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     const code = urlParams.get('code');
     
     if (code) {
-        // Clear query parameters from URL clean looking tracking
         window.history.replaceState({}, document.title, window.location.pathname);
         await exchangeCodeForToken(code);
     } else if (sessionStorage.getItem('xero_access_token')) {
@@ -100,87 +99,51 @@ window.addEventListener('DOMContentLoaded', async () => {
 async function exchangeCodeForToken(code) {
     const verifier = sessionStorage.getItem('xero_code_verifier');
     try {
-        const response = await fetch(`${PROXY_BASE}/api/token`, {
+        // Updated to use your clean /callback backend endpoint
+        const response = await fetch(`${PROXY_BASE}/callback`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ code, verifier, redirect_uri: REDIRECT_URI })
         });
-        const tokens = await response.json();
+        const data = await response.json();
         
-        if(tokens.access_token) {
-            storeTokens(tokens);
-            await fetchTenantId();
+        if (data.status === 'success' || data.access_token) {
+            // Map keys correctly whether backend sends direct or wrapped data
+            const accessToken = data.access_token || (data.tokens && data.tokens.access_token);
+            const refreshToken = data.refresh_token || (data.tokens && data.tokens.refresh_token);
+            const expiresIn = data.expires_in || (data.tokens && data.tokens.expires_in) || 3600;
+            const orgName = data.orgName || "Connected to Xero";
+
+            sessionStorage.setItem('xero_access_token', accessToken);
+            sessionStorage.setItem('xero_refresh_token', refreshToken);
+            sessionStorage.setItem('xero_expires_at', Date.now() + (expiresIn * 1000));
+            sessionStorage.setItem('xero_org_name', orgName);
+            
             showDashboard();
+        } else {
+            alert('Token exchange failed: ' + data.message);
         }
     } catch (err) {
         console.error('Error exchanging token:', err);
     }
 }
 
-function storeTokens(tokens) {
-    sessionStorage.setItem('xero_access_token', tokens.access_token);
-    sessionStorage.setItem('xero_refresh_token', tokens.refresh_token);
-    sessionStorage.setItem('xero_expires_at', Date.now() + (tokens.expires_in * 1000));
-}
-
-// --- SECURE DATA FETCHING & AUTO-REFRESH ---
-async function getXeroData(url) {
-    let expiresAt = sessionStorage.getItem('xero_expires_at');
-    let token = sessionStorage.getItem('xero_access_token');
-    
-    // Auto-refresh token if it's within 30 seconds of expiring
-    if (Date.now() > (expiresAt - 30000)) {
-        const refreshToken = sessionStorage.getItem('xero_refresh_token');
-        const response = await fetch(`${PROXY_BASE}/api/refresh`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refresh_token: refreshToken })
-        });
-        const tokens = await response.json();
-        storeTokens(tokens);
-        token = tokens.access_token;
-    }
-
-    const tenantId = sessionStorage.getItem('xero_tenant_id');
-    const proxyResponse = await fetch(`${PROXY_BASE}/api/xero-proxy`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, token, tenantId })
-    });
-    return await proxyResponse.json();
-}
-
-async function fetchTenantId() {
-    const token = sessionStorage.getItem('xero_access_token');
-    const response = await fetch(`${PROXY_BASE}/api/xero-proxy`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: 'https://api.xero.com/connections', token })
-    });
-    const connections = await response.json();
-    if(connections && connections.length > 0) {
-        sessionStorage.setItem('xero_tenant_id', connections[0].tenantId);
-    }
-}
-
+// --- SECURE DATA FETCHING ---
 async function showDashboard() {
     document.getElementById('connect-screen').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
     
-    // Fetch and display Organisation Name as proof of life!
-    try {
-        const orgData = await getXeroData('https://api.xero.com/api.xro/2.0/Organisation');
-        if(orgData && orgData.Organisations) {
-            document.getElementById('org-name').innerText = orgData.Organisations[0].Name;
-        }
-    } catch(err) {
+    const storedName = sessionStorage.getItem('xero_org_name');
+    if (storedName) {
+        document.getElementById('org-name').innerText = storedName;
+    } else {
         document.getElementById('org-name').innerText = "Connected to Xero";
     }
 }
 
 function disconnect() {
     sessionStorage.clear();
-    window.location.href = window.location.pathname; 
+    window.location.href = REDIRECT_URI; 
 }
 </script>
 </body>
